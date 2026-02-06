@@ -141,21 +141,6 @@ if( is_user_logged_in() ){
                     <p>สังกัด: <?php echo esc_html( get_user_meta($current_user->ID, 'organization', true) ); ?></p>
                     <p>เกี่ยวข้องกับเด็ก: <?php echo esc_html( get_user_meta($current_user->ID, 'child_role', true) ); ?></p>
                     <p>เป้าหมายในการใช้เว็บไซต์: <?php echo esc_html( get_user_meta($current_user->ID, 'goal_hook_learning', true) ); ?></p>
-                    <p>
-                    <?php
-                        $privacy_values = get_field('privacy_policy', 'user_' . get_current_user_id());
-
-                        if (!empty($privacy_values)) :
-                            foreach ($privacy_values as $value) :
-                        ?>
-                                <p>✔ <?php echo esc_html($value); ?></p>
-                        <?php
-                            endforeach;
-                        else :
-                        ?>
-                            <p>✘ ยังไม่ยอมรับข้อกำหนด</p>
-                        <?php endif; ?>
-                    </p>
                     </div>
                 </div>
                 <h3 class="s-title">เกี่ยวคอร์สเรียน</h3>
