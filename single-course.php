@@ -8,7 +8,7 @@ if( $parents || isset($_GET['type']) ){
 }
 ?>
 <main id="main" class="site-main single-main <?php echo $add_class; ?>">
-<p>X</p>
+
     <?php 
         if( $parents ) {
             get_template_part('parts/single', 'content-lesson');
