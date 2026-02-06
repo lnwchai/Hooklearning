@@ -222,6 +222,7 @@ if( is_user_logged_in() ){
 
     </div>
 </main>
+<p>x</p>
 
 <div class="form-edit-name" style="display: none;">
     <form class="edit-users">
