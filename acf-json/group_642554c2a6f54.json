@@ -1,0 +1,109 @@
+{
+    "key": "group_642554c2a6f54",
+    "title": "Post",
+    "fields": [
+        {
+            "key": "field_642554c33fc63",
+            "label": "Reference",
+            "name": "reference",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "placeholder": "",
+            "prepend": "ที่มา:",
+            "append": ""
+        },
+        {
+            "key": "field_642554fc3fc64",
+            "label": "Photographer",
+            "name": "photographer",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "placeholder": "",
+            "prepend": "ภาพ:",
+            "append": ""
+        },
+        {
+            "key": "field_64b0ce6b7aee5",
+            "label": "Teachers",
+            "name": "teachers",
+            "aria-label": "",
+            "type": "repeater",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "layout": "table",
+            "pagination": 0,
+            "min": 0,
+            "max": 0,
+            "collapsed": "",
+            "button_label": "Add Teacher",
+            "rows_per_page": 20,
+            "sub_fields": [
+                {
+                    "key": "field_64b0ce8b7aee6",
+                    "label": "Teacher Select",
+                    "name": "teacher_select",
+                    "aria-label": "",
+                    "type": "user",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "role": "",
+                    "return_format": "id",
+                    "multiple": 0,
+                    "allow_null": 0,
+                    "parent_repeater": "field_64b0ce6b7aee5"
+                }
+            ]
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "post_type",
+                "operator": "==",
+                "value": "post"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "acf_after_title",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "",
+    "show_in_rest": 0,
+    "modified": 1689308904
+}

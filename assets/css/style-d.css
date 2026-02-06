@@ -1,0 +1,47 @@
+/* CSS Variables for consistent theming */
+:root {
+    --s-gap: 20px;
+    --s-color-1: #6842ef;
+    --s-color-2: #ef4242;
+    --s-rounded-2: 8px;
+}
+
+/* Navigation Panel */
+.nav-panel {
+    flex: 1 0 0;
+    padding-left: var(--s-gap);
+    font-weight: 700;
+}
+
+/* Course Area Layout */
+.course-area {
+    display: flex;
+    gap: var(--s-gap);
+}
+
+.course-area .course-sitebar {
+    width: 29%;
+}
+
+.course-area .course-content {
+    width: 69%;
+}
+
+/* Account Login Styles */
+.s-account-login p {
+    margin: 0;
+}
+
+.s-account-login a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.s-account-login img {
+    border-radius: 99px;
+    width: 34px;
+    height: 34px;
+}
+
+/*# sourceMappingURL=style-d.css.map */

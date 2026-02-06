@@ -1,0 +1,35 @@
+// HEADER
+.nav-panel {
+  flex: 1 0 0;
+  padding-left: var(--s-gap);
+  font-weight: 700;
+}
+.course-area {
+  display: flex;
+  gap: var(--s-gap);
+  .course-sitebar {
+    width: 29%;
+  }
+  .course-content {
+    width: 69%;
+  }
+}
+
+
+
+
+.s-account-login {
+  p {
+    margin: 0;
+  }
+  a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  img {
+    border-radius: 99px;
+    width: 34px;
+    height: 34px;
+  }
+}

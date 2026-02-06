@@ -1,0 +1,20 @@
+{
+  "name": "hook-theme",
+  "version": "1.0.0",
+  "description": "WordPress theme with optimized assets",
+  "scripts": {
+    "build": "npm run build:css && npm run build:js",
+    "build:css": "cleancss assets/css/style-d.css -o assets/dist/style-d.min.css --source-map && cleancss assets/css/style-m.css -o assets/dist/style-m.min.css --source-map",
+    "build:js": "uglifyjs assets/js/main.js -o assets/dist/main.min.js --source-map && uglifyjs assets/js/vimeo.js -o assets/dist/vimeo.min.js --source-map && uglifyjs assets/js/html2canvas.js -o assets/dist/html2canvas.min.js --source-map",
+    "watch": "npm run build && npm run build:css -- --watch",
+    "clean": "rm -rf assets/dist",
+    "install-tools": "npm install -g uglycss uglyjs"
+  },
+  "devDependencies": {
+    "clean-css-cli": "^5.6.3",
+    "uglify-js": "^3.17.4"
+  },
+  "keywords": ["wordpress", "theme", "css", "javascript", "minification"],
+  "author": "Your Name",
+  "license": "MIT"
+}
