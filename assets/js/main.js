@@ -241,8 +241,3 @@ function downloadImage(url) {
       a.remove();
     })
   }
-
-
-
-
-
