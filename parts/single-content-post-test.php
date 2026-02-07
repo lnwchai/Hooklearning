@@ -1,10 +1,20 @@
 <?php 
+// check if user is login
+if(!is_user_logged_in()) {
+    wp_redirect( '/login-signup' );
+    exit;
+}
 global $post;
 $current_id = $post->ID;
 $parents = get_post_ancestors($current_id);
 $root_id = ($parents) ? $parents[count($parents) - 1] : $current_id;
-$youtube = get_field('youtube', $current_id);
-$file_download = get_field('file_download',$current_id);
+$post_test_form = get_field('post_test', $root_id);
+
+// Redirect if post-test is not configured
+if(!$post_test_form) {
+    wp_redirect( get_permalink($root_id) );
+    exit;
+}
 
 // get posttype course_log
 $arg = array(
@@ -29,7 +39,6 @@ $root_id_log = new WP_Query($arg);
 $lessons_id_complete = array();
 while($root_id_log->have_posts()) {
     $root_id_log->the_post();
-    // string to array
     $lessons_id_complete = explode(',', get_field('lessons_id_complete', get_the_ID()));
 }
 wp_reset_postdata();
@@ -76,8 +85,18 @@ $args_post_test = array(
 );
 $post_test_log = get_posts($args_post_test);
 
-// Question log for regular questions (exclude pre/post)
-$args = array(
+$arg = array(
+    'post_type' => 'course',
+    'posts_per_page' => -1,
+    'post_parent' => $root_id,
+    'orderby' => 'menu_order',
+);
+$lessons = new WP_Query($arg);
+$lesson_list_html = '';
+$count_lession = $lessons->post_count;
+
+// Question log for regular questions (for sidebar complete state)
+$args_questions = array(
     'post_type' => 'question_log',
     'posts_per_page' => 1,
     'author' => get_current_user_id(),
@@ -102,18 +121,8 @@ $args = array(
         ),
     ),
 );
-$quesion_log = get_posts($args);
+$quesion_log = get_posts($args_questions);
 
-$arg = array(
-    'post_type' => 'course',
-    'posts_per_page' => -1,
-    'post_parent' => $root_id,
-    'orderby' => 'menu_order',
-);
-$lessons = new WP_Query($arg);
-
-$lesson_list_html = '';
-$count_lession = $lessons->post_count;
 if($lessons) {
     $lesson_list_html .= '<ul class="course-sitebar-list">';
     $lesson_list_html .= '<li>รายละเอียด คอร์ส</li>';
@@ -136,19 +145,15 @@ if($lessons) {
         $lessons->the_post();
         if (get_the_ID() == $current_id ) {
             ob_start();
-            $lesson_list_html .=  '<li class="les-'.get_the_ID().' current"><a href="'. get_permalink() .'">';
-            if (in_array(get_the_ID(), $lessons_id_complete)) {
-                seed_icon('i-check');
-            }else{
-                seed_icon('i-play');
-            }
+            $lesson_list_html .=  '<li class="current"><a href="'. get_permalink() .'">';
+            seed_icon('i-play');
             $lesson_list_html .=  ob_get_clean();
             $lesson_list_html .=  get_the_title();
             $lesson_list_html .=  '</a></li>';
         }
         elseif (in_array(get_the_ID(), $lessons_id_complete)) {
             ob_start();
-            $lesson_list_html .=  '<li class="les-'.get_the_ID().' complete"><a href="'. get_permalink() .'">';
+            $lesson_list_html .=  '<li class="complete"><a href="'. get_permalink() .'">';
             seed_icon('i-check');
             $lesson_list_html .=  ob_get_clean();
             $lesson_list_html .=  get_the_title();
@@ -156,7 +161,7 @@ if($lessons) {
         }
         else {
             ob_start();
-            $lesson_list_html .=  '<li class="les-'.get_the_ID().' "><a href="'. get_permalink() .'">';
+            $lesson_list_html .=  '<li><a href="'. get_permalink() .'">';
             seed_icon('i-play');
             $lesson_list_html .=  ob_get_clean();
             $lesson_list_html .=  get_the_title();
@@ -175,19 +180,16 @@ if($lessons) {
     }
     $lesson_list_html .= 'คำถามท้ายบทเรียน</a></li>';
 
-    $post_test = get_field('post_test', $root_id);
-    if($post_test) {
-        $lesson_list_html .= '<li><a href="'.get_permalink( $root_id ).'?type=post_test">';
-        if( !empty($post_test_log) ){
-            $lesson_list_html .= ' <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    $lesson_list_html .= '<li class="current"><a href="'.get_permalink( $root_id ).'?type=post_test">';
+    if( !empty($post_test_log) ){
+        $lesson_list_html .= ' <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M12 2C6.48698 2 2 6.48698 2 12C2 17.513 6.48698 22 12 22C17.513 22 22 17.513 22 12C22 6.48698 17.513 2 12 2ZM12 3.5C16.7031 3.5 20.5 7.29687 20.5 12C20.5 16.7031 16.7031 20.5 12 20.5C7.29687 20.5 3.5 16.7031 3.5 12C3.5 7.29687 7.29687 3.5 12 3.5ZM15.7344 8.99219C15.5417 9 15.3568 9.08073 15.2187 9.21875L10.75 13.6901L8.78125 11.7187C8.59115 11.5234 8.3125 11.4453 8.04948 11.513C7.78646 11.5807 7.58073 11.7865 7.51302 12.0495C7.44531 12.3125 7.52344 12.5911 7.71875 12.7812L10.2187 15.2812C10.513 15.5729 10.987 15.5729 11.2812 15.2812L16.2812 10.2812C16.5026 10.0651 16.5677 9.73437 16.4479 9.45052C16.3281 9.16667 16.0443 8.98437 15.7344 8.99219Z" fill="#2accc8" /> </svg>';
-        } else {
-            $lesson_list_html .= '<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+    } else {
+        $lesson_list_html .= '<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M6 0C4.90687 0 3.99937 0.9075 3.99937 2.00062V15.9994C3.99937 17.0925 4.90687 18 6 18H15.9994C17.0925 18 18 17.0925 18 15.9994V2.00062C18 0.9075 17.0925 0 15.9994 0H6ZM0 0.999375V17.0006H2.00062V0.999375H0ZM6 2.00062H15.9994V15.9994H6V2.00062ZM11.0006 3.99937C10.0931 3.99937 9.285 4.38 8.7675 4.9575C8.25 5.53312 8.00062 6.26813 8.00062 6.99937H9.99937C9.99937 6.73313 10.0987 6.46687 10.2562 6.2925C10.4119 6.12 10.605 6 11.0006 6C11.4056 6 11.5987 6.11812 11.7506 6.28312C11.9006 6.44812 12 6.705 12 6.99937C12 7.56563 11.73 7.90313 11.2444 8.46375C10.7587 9.0225 9.99937 9.79688 9.99937 11.0006H12C12 10.665 12.2419 10.3669 12.7556 9.77437C13.2712 9.18 14.0006 8.28563 14.0006 6.99937C14.0006 6.25688 13.7513 5.5125 13.2281 4.93687C12.705 4.36313 11.8969 3.99937 11.0006 3.99937ZM9.99937 12V14.0006H12V12H9.99937Z" fill="#999999"/>
         </svg>';
-        }
-        $lesson_list_html .= 'แบบประเมินหลังเรียน</a></li>';
     }
+    $lesson_list_html .= 'แบบประเมินหลังเรียน</a></li>';
 
     $lesson_list_html .= '<li><a href="'.get_permalink( $root_id ).'?type=certificate">';
     $lesson_list_html .= '<svg width="20" height="19" viewBox="0 0 20 19" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -198,10 +200,8 @@ if($lessons) {
 }
 wp_reset_postdata();
 ?>
-
-
-
 <div class="_space"></div>
+
 <div class="course-area">
     <div class="course-sitebar">
         <div class="course-sitebar-header">
@@ -219,140 +219,24 @@ wp_reset_postdata();
     </div>
 
     <div class="course-content">
-        <?php 
-        $vimeo = get_field('vimeo', $current_id);
-        if($vimeo) {
-            $vimeo = explode('/', $vimeo);
-            $lesson_time_log = get_user_meta( get_current_user_id(), 'lesson_time_log', true );
-            $log_array = (array) json_decode($lesson_time_log);
-            $lesson_id = get_the_ID();
-            $lesson_time = isset($log_array[$lesson_id]) ? $log_array[$lesson_id] : 0;
-
-            if($vimeo[3]) {
-                $vimeo = $vimeo[3];
-                if(is_user_logged_in()) {
-                    $autoplay = '?autoplay=1';
-                }else{
-                    $autoplay = '';
-                }
-                echo '<iframe id="lesson-video" src="https://player.vimeo.com/video/'. $vimeo .''. $autoplay .'" width="640" height="380" frameborder="0"
-                    allow="autoplay; fullscreen" allowfullscreen></iframe>'; 
-                echo '<input type="hidden" class="lesson-current-time" value="'.$lesson_time.'">';
-                echo '<input type="hidden" class="lesson-id" value="'.get_the_ID().'">';
-            }
-        }
-        ?>
-
         <div class="card course-info">
             <div class="s-flex justify-between">
                 <h3 class="s-title">
-                    รายละเอียด
+                    แบบประเมินหลังเรียน
                 </h3>
                 <div class="share">
                     <?php if(function_exists('seed_social')) { seed_social();} ?>
                 </div>
             </div>
-            <?php echo get_post_field('post_content', $current_id); ?>
-        </div>
-
-        <div class="card course-document">
-            <h3 class="s-title">
-                เอกสารประกอบการเรียน
-            </h3>
-            <p>
-                <?php if ( have_rows( 'file_download' ) ) : ?>
-                    <?php while ( have_rows( 'file_download' ) ) : the_row(); ?>
-                        <?php $file = get_sub_field( 'file' ); ?>
-                        <?php if ( $file ) : ?>
-                            <p>
-                            <a href="<?php echo esc_url( $file['url'] ); ?>"><?php echo $pdf_title = $file[ 'title' ]; ?></a>
-                            </p>
-                        <?php endif; ?>
-                    <?php endwhile; ?>
-                <?php else : ?>
-                    <?php // No rows found ?>
-                <?php endif; ?>  
-
-                <?php if ( have_rows( 'study_doc' ) ) : ?>
-                    <?php while ( have_rows( 'study_doc' ) ) : the_row(); ?>
-                        <?php $study_file = get_sub_field( 'study_file' ); ?>
-                        <?php if ( $study_file ) : ?>
-                            <p>
-                            <a href="<?php echo esc_url( $study_file['url'] ); ?>"><?php echo $pdf_title = $study_fil[ 'title' ]; ?></a>
-                            </p>
-                        <?php endif; ?>
-                    <?php endwhile; ?>
-                <?php else : ?>
-                    <?php // No rows found ?>
-                <?php endif; ?>
-
-       
-
-            </p> 
-            
-        </div>
-
-        <div class="lerning-recomment">
-        <h3 class="s-title">แหล่งความรู้แนะนำ เพื่อศึกษาเพิ่มเติม</h3>
-        <div class="s-grid -d3">
-            <?php 
-            $lerning_list = get_field('lerning_recommend'); 
-            if ( $lerning_list && is_array( $lerning_list ) ) :
-                foreach($lerning_list as $data): ?>
-                <article <?php post_class('s-content s-content-card'); ?>>
-                    <div class="entry-pic entry-pic-card">
-                        <a href="<?php echo $data['link']; ?>"><?php echo $data['title']; ?>
-                            <?php
-                                $pic = $data['thumbnail'];
-                                echo wp_get_attachment_image( $pic, 'full' );
-                            ?>
-                        </a>
-                    </div>
-                    <div class="entry-info entry-info-card">
-                        <h2 class="entry-title">
-                            <a href="<?php echo $data['link']; ?>"><?php echo $data['title']; ?></a>
-                        </h2>
-                        <div class="entry-more"><a href="<?php echo $data['link']; ?>" class="btn-readmore -underline"><span></span><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></a></div>
-                    </div>
-                </article>
-            <?php endforeach; 
-            endif; ?>
-        </div>
-    </div>
-
-        <?php //if (!in_array(get_the_ID(), $lessons_id_complete)): ?>
-            <input type="hidden" class="ls-lesson-id" value="<?php echo $current_id; ?>">
-            <input type="hidden" class="ls-course-id" value="<?php echo $root_id; ?>">
-            <?php 
-            // Add nonce for AJAX requests
-            $nonce_complete = wp_create_nonce( 'complete_lesson_action' );
-            $nonce_complete_not_end = wp_create_nonce( 'complete_lesson_action_not_end' );
-            ?>
-            <input type="hidden" class="ls-nonce-complete" value="<?php echo $nonce_complete; ?>">
-            <input type="hidden" class="ls-nonce-complete-not-end" value="<?php echo $nonce_complete_not_end; ?>">
-        <?php //endif; ?>
-    </div>
-</div>
-
-<?php if( !is_user_logged_in() ): ?>
-    <div class="popup-for-login"style="display: none;">
-        <div class="content">
-            <div class="pic">
-                <img src="https://hooklearning.com/wp-content/uploads/2023/06/template-HOOK.png" alt="">            
-            </div>
-            <div class="btn-group s-grid -d2">
-                <a href="#" class="lerning"> ไว้ทีหลัง</a>
-                <a href="/login" class="login">ลงทะเบียนเลย</a>
+            <div class="questions-forms">
+                <?php 
+                if( empty($post_test_log) ){
+                    echo do_shortcode( '[gravityform id="'.$post_test_form.'" title="false" description="false" ajax="false"]' );
+                }else{
+                    echo '<h4 class="text-center">คุณได้ส่งแบบประเมินหลังเรียนเรียบร้อยแล้ว</h4>';
+                }
+                ?>
             </div>
         </div>
     </div>
-<?php endif; ?>
-
-<?php if (!get_field('form_survey', 'user_' . get_current_user_id())): ?>
-<div id="course-popup" class="course-popup-overlay" style="display:none;">
-    <div class="course-popup-box">
-        <h2>กรุณากรอกฟอร์มแบบประเมินความพึงพอใจ</h2>
-        <?php echo do_shortcode('[gravityform id="16" title="false" description="false"]'); ?>
-    </div>
 </div>
-<?php endif; ?>

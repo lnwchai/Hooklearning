@@ -66,7 +66,8 @@
         <div class="s-grid -d3">
             <?php 
             $lerning_list = get_field('lerning_recommend'); 
-            foreach($lerning_list as $data): ?>
+            if ( is_array( $lerning_list ) && ! empty( $lerning_list ) ) :
+                foreach ( $lerning_list as $data ) : ?>
                 <article <?php post_class('s-content s-content-card'); ?>>
                     <div class="entry-pic entry-pic-card">
                         <a href="<?php echo $data['title']; ?>" title="Permalink to ">
@@ -84,6 +85,7 @@
                     </div>
                 </article>
             <?php endforeach; ?>
+            <?php endif; ?>
         </div>
     </div>
 </div>

@@ -327,7 +327,7 @@ add_filter( 'body_class', 'custom_class' );
 function custom_class( $classes ) {
     if ( is_singular( 'course' ) ) {
         $post_id = get_the_ID();
-        $parents = get_post_ancestors($post->ID);
+        $parents = get_post_ancestors($post_id);
         if($parents) {
             $classes[] = 's-single-lesson';
         }
@@ -375,12 +375,21 @@ add_action( 'gform_after_submission', 'create_question_logs', 10, 2 );
 function create_question_logs( $entry, $form ) {
     $entry_id = $entry['id'];
     $course_id = rgar( $entry, '3' );
-    if ($form['id'] == 12) {
+    if ($form['id'] == 12 || ($course_id == null || intval($course_id) == 0)) {
         $course_id = rgar( $entry, '20' );
     }
 
     $user = wp_get_current_user();
-    $title = get_the_title( $course_id ) .' '. ' ( ' . $user->display_name . ' )';
+    $type_full = rgar( $entry, '21' );
+    if ($type_full == 'pre_test' || $type_full == 'post_test') {
+        $name = $type_full == 'pre_test' ? 'แบบประเมินก่อนเรียน' : 'แบบประเมินหลังเรียน';
+        $type = str_replace('test', '', $type_full);
+    } else {
+        $name = 'คำถามท้ายบทเรียน';
+        $type = 'last';
+    }
+
+    $title = $name . ' : ' . get_the_title( $course_id ) . ' ( ' . $user->display_name . ' )';
 
     $post = array(
         'post_title' => $title,
@@ -391,7 +400,8 @@ function create_question_logs( $entry, $form ) {
 
     $pid = wp_insert_post($post);
     update_field('answers_entry_id', $entry_id , $pid);
-    update_field('course_id', $course_id , $pid);
+    update_field('course_id', $course_id ,$pid);
+    update_field('type', trim($type) , $pid);
 }
 
 add_shortcode( 's_account_login', 'account_login' );
@@ -447,7 +457,6 @@ function get_image_capture(){
 add_action('wp_ajax_get_image_capture', 'get_image_capture');
 add_action('wp_ajax_nopriv_get_image_capture', 'get_image_capture');
 
-
-
-
 define('PLANT_DISABLE_ACF', true);
+
+

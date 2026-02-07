@@ -8,6 +8,7 @@ if( $parents || isset($_GET['type']) ){
 }
 ?>
 <main id="main" class="site-main single-main <?php echo $add_class; ?>">
+
     <?php 
         if( $parents ) {
             get_template_part('parts/single', 'content-lesson');
@@ -16,6 +17,10 @@ if( $parents || isset($_GET['type']) ){
                 get_template_part('parts/single', 'content-questions');
             }else if(isset($_GET['type']) && $_GET['type'] == 'certificate'){
                 get_template_part('parts/single', 'content-certificate');
+            }else if(isset($_GET['type']) && $_GET['type'] == 'pre_test'){
+                get_template_part('parts/single', 'content-pre-test');
+            }else if(isset($_GET['type']) && $_GET['type'] == 'post_test'){
+                get_template_part('parts/single', 'content-post-test');
             }else{
                 get_template_part('parts/single', 'content-course');
             }
