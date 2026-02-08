@@ -111,6 +111,8 @@ $args_questions = array(
 );
 $quesion_log = get_posts($args_questions);
 
+
+
 $arg = array(
     'post_type' => 'course',
     'posts_per_page' => -1,
@@ -251,7 +253,7 @@ wp_reset_postdata();
                     </svg> 
                 </a>
             </div>
-            <?php if( get_field('course_status', $course_log) != true && !empty($quesion_log) ) : ?>
+            <?php if( get_field('course_status', $course_log) != true && !empty($quesion_log)  && !empty($post_test_log) && !empty($pre_test_log) ) : ?>
                 <div class="cert-notice">
                     <h3>เพื่อรับประกาศนียบัตร 
                         <br>กรุณารับชมบทเรียนในคอร์สให้ครบถ้วนทุกตอน 

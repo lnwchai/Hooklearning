@@ -53,7 +53,13 @@ $args_pre_test = array(
         ),
     ),
 );
+
 $pre_test_log = get_posts($args_pre_test);
+$pre_test = get_field('pre_test', $root_id);
+if (empty($pre_test_log) && $pre_test) {
+    wp_redirect( get_permalink($root_id) . '?type=pre_test' );
+    exit;
+}
 
 // Question log for post-test (type = post)
 $args_post_test = array(
@@ -118,7 +124,6 @@ if($lessons) {
     $lesson_list_html .= '<ul class="course-sitebar-list">';
     $lesson_list_html .= '<li>รายละเอียด คอร์ส</li>';
 
-    $pre_test = get_field('pre_test', $root_id);
     if($pre_test) {
         $lesson_list_html .= '<li><a href="'.get_permalink( $root_id ).'?type=pre_test">';
         if( !empty($pre_test_log) ){
