@@ -460,3 +460,30 @@ add_action('wp_ajax_nopriv_get_image_capture', 'get_image_capture');
 define('PLANT_DISABLE_ACF', true);
 
 
+// check survey form
+function get_survey_form_entry() {
+    $user = wp_get_current_user();
+    $form_id = 16;
+
+    // get entry in gravity form
+    $entry = GFAPI::get_entries( $form_id, array( 'field_filters' => array( array( 'key' => 'created_by', 'value' => $user->ID ) ) ) );
+    return $entry;
+}
+
+// user course log
+function user_course_log() {
+    $course_log = get_posts(array(
+        'post_type' => 'course_log',
+        'post_status' => 'publish',
+        'posts_per_page' => 10,
+        'meta_query' => array(
+            array(
+                'key' => 'student',
+                'value' => get_current_user_id(),
+                'compare' => '=',
+            ),
+        )
+    ));
+    
+    return $course_log;
+}

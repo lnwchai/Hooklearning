@@ -31,5 +31,20 @@ if( $parents || isset($_GET['type']) ){
 </main>
 
 <?php 
+$survay = get_survey_form_entry ();
+$course_log = user_course_log();
+if(count($course_log) > 0 && count($survay) == 0 ) : ?>
+<div id="survey-modal" class="s-modal-survey-wrap">
+    <div class="s-modal-survey-bg"></div>
+    <div class="s-modal-survey" role="dialog" aria-modal="true" aria-labelledby="survey-modal-title">
+        <button type="button" class="btn-close-modal s-modal-survey-close" aria-label="Close">&times;</button>
+        <h2 id="survey-modal-title" class="s-modal-survey-title">แบบประเมินความพึงพอใจ</h2>
+        <div class="s-modal-survey-content">
+            <?php echo do_shortcode( '[gravityform id="16" title="false" description="false" ajax="false"]' ); ?>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+<?php 
 get_footer(); 
 ?>

@@ -222,7 +222,6 @@ if( is_user_logged_in() ){
 
     </div>
 </main>
-<p>x</p>
 
 <div class="form-edit-name" style="display: none;">
     <form class="edit-users">
@@ -243,6 +242,23 @@ if( is_user_logged_in() ){
     </form>
 </div>
 
+<?php
+$lastname = get_user_meta($current_user->ID, 'last_name', true);
+$age = get_user_meta($current_user->ID, 'age', true);
+$job = get_user_meta($current_user->ID, 'job', true);
+
+if ($lastname  == '' && $age == '' && $job == '')  : ?>
+<div id="survey-modal" class="s-modal-survey-wrap">
+    <div class="s-modal-survey-bg"></div>
+    <div class="s-modal-survey" role="dialog" aria-modal="true" aria-labelledby="survey-modal-title">
+        <button type="button" class="btn-close-modal s-modal-survey-close" aria-label="Close">&times;</button>
+        <h2 id="survey-modal-title" class="s-modal-survey-title">แบบประเมินความพึงพอใจ</h2>
+        <div class="s-modal-survey-content">
+            <?php echo do_shortcode( '[gravityform id="15" title="false" description="false" ajax="false"]' ); ?>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
 
 <script>
 document.addEventListener('gform_confirmation_loaded', function () {

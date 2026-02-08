@@ -1,3 +1,8 @@
+document.addEventListener("DOMContentLoaded", function () {
+    var surveyModal = document.getElementById('survey-modal');
+    if (surveyModal) surveyModal.classList.add('show');
+});
+
 document.addEventListener("click", function (event) {
     if (event.target.matches(".btn-complete-lesson")) {
         completeLesson(event.target);
@@ -7,6 +12,9 @@ document.addEventListener("click", function (event) {
     }
     if (event.target.matches(".btn-close-modal")) {
         closeModal(event.target);
+    }
+    if (event.target.closest(".s-modal-survey-bg")) {
+        closeSurveyModal();
     }
 
     if(event.target.matches(".nav-toggle")) {
@@ -192,14 +200,28 @@ function showModal() {
     }
 }
 
-function closeModal() {
-    console.log('close modal');
+function closeModal(target) {
+    var surveyWrap = target && target.closest ? target.closest('.s-modal-survey-wrap') : null;
+    if (surveyWrap) {
+        closeSurveyModal();
+        return;
+    }
     if (document.querySelector('.s-modal-alert')) {
         document.querySelector('.s-modal-alert').classList.remove('show');
     }
     if (document.querySelector('.s-modal-bg')) {
         document.querySelector('.s-modal-bg').classList.remove('show');
     }
+}
+
+function showSurveyModal() {
+    var wrap = document.getElementById('survey-modal');
+    if (wrap) wrap.classList.add('show');
+}
+
+function closeSurveyModal() {
+    var wrap = document.getElementById('survey-modal');
+    if (wrap) wrap.classList.remove('show');
 }
 
 function doCapture() {
@@ -241,3 +263,8 @@ function downloadImage(url) {
       a.remove();
     })
   }
+
+
+
+
+

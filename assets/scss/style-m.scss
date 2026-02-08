@@ -1137,6 +1137,76 @@ ul.course-sitebar-list {
   }
 }
 
+// Survey form modal
+.s-modal-survey-wrap {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--s-gap);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+
+  &.show {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.s-modal-survey-bg {
+  position: absolute;
+  inset: 0;
+  background-color: rgb(0 0 0 / 60%);
+  cursor: pointer;
+}
+
+.s-modal-survey {
+  position: relative;
+  background: #fff;
+  border-radius: var(--s-rounded-2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  max-width: 720px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: var(--s-space);
+}
+
+.s-modal-survey-close {
+  position: absolute;
+  top: var(--s-gap);
+  right: var(--s-gap);
+  background: none;
+  border: none;
+  font-size: 28px;
+  line-height: 1;
+  color: var(--s-text-2);
+  cursor: pointer;
+  padding: 4px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    color: var(--s-text-1);
+  }
+}
+
+.s-modal-survey-title {
+  margin: 0 0 var(--s-gap);
+  padding-right: 40px;
+  font-size: 1.25rem;
+}
+
+.s-modal-survey-content {
+  margin-top: var(--s-gap);
+}
+
 .s-lesson-list {
   display: flex;
   flex-wrap: wrap;
