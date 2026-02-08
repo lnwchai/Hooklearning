@@ -252,7 +252,7 @@ if ($lastname  == '' && $age == '' && $job == '')  : ?>
     <div class="s-modal-survey-bg"></div>
     <div class="s-modal-survey" role="dialog" aria-modal="true" aria-labelledby="survey-modal-title">
         <button type="button" class="btn-close-modal s-modal-survey-close" aria-label="Close">&times;</button>
-        <h2 id="survey-modal-title" class="s-modal-survey-title">แบบประเมินความพึงพอใจ</h2>
+        <h2 id="survey-modal-title" class="s-modal-survey-title">ข้อมูลส่วนตัว</h2>
         <div class="s-modal-survey-content">
             <?php echo do_shortcode( '[gravityform id="15" title="false" description="false" ajax="false"]' ); ?>
         </div>
