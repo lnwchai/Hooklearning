@@ -10,6 +10,11 @@ document.addEventListener("click", function (event) {
     if (event.target.matches(".btn-answer-question")) {
         submitAnswers(event.target);
     }
+    if (event.target.closest(".button-download")) {
+        event.preventDefault();
+        doCapture();
+        return;
+    }
     if (event.target.matches(".btn-close-modal")) {
         closeModal(event.target);
     }
@@ -235,16 +240,28 @@ function doCapture() {
     }
     html2canvas(document.querySelector('.cert-iamge'),
     { scale: sc }).then(function (canvas) {
-        // Create an AJAX object
-        var ajax = new XMLHttpRequest();
-        ajax.open("POST", "/wp-admin/admin-ajax.php", true);
-        ajax.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        ajax.send("action=get_image_capture&image=" + canvas.toDataURL("image/jpeg", 1.0));
-        ajax.onreadystatechange = function () {
-            if (this.readyState == 4 && this.status == 200) {
-                downloadImage(this.responseText);
+        fetch(hookRest.apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-WP-Nonce': hookRest.nonce,
+            },
+            body: JSON.stringify({
+                image: canvas.toDataURL("image/jpeg", 1.0),
+            }),
+        })
+        .then(function (res) {
+            if (res.ok) {
+                return res.json();
             }
-        };
+            throw new Error('Request failed: ' + res.status);
+        })
+        .then(function (url) {
+            downloadImage(url);
+        })
+        .catch(function (err) {
+            console.error(err);
+        });
     });
 }
 

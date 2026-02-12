@@ -8,6 +8,10 @@ function fruit_scripts()
     wp_enqueue_style('f-m', $url . 'css/style-m.css', [], $ver);
     wp_enqueue_style('f-d', $url . 'css/style-d.css', [], $ver, '(min-width: 1024px)');
     wp_enqueue_script('f', $url . 'js/main.js', [], $ver, true);
+    wp_localize_script('f', 'hookRest', array(
+        'apiUrl' => rest_url('hook/v1/image-capture'),
+        'nonce' => wp_create_nonce('wp_rest'),
+    ));
     wp_enqueue_script('f-player', 'https://player.vimeo.com/api/player.js', [], $ver, false);
     wp_enqueue_script('f-vimeo', $url . 'js/vimeo.js', [], $ver, true);
     wp_enqueue_script('f-cavas', $url . 'js/html2canvas.js', [], $ver);
@@ -440,22 +444,52 @@ function hook_set_comment_form_defaults( $defaults ) {
 }
 add_filter( 'comment_form_defaults', 'hook_set_comment_form_defaults' );
 
-//
-function get_image_capture(){
-    $img = isset( $_POST['image'] ) ? $_POST['image'] : '';
-    
-    $image = explode(";", $img)[1];
-    $image = explode(",", $image )[1];
+
+/**
+ * REST API: Image capture (certificate)
+ */
+
+add_action('rest_api_init', function(){
+    register_rest_route('hook/v1', '/image-capture', array(
+        'methods' => 'POST',
+        'callback' => 'get_image_capture_rest',
+        'permission_callback' => '__return_true',
+        'args' => array(
+            'image' => array(
+                'required' => true,
+                'type' => 'string',
+            ),
+        ),
+    ));
+});
+
+function get_image_capture_rest($request){
+    $img = $request->get_param('image');
+    if (empty($img)) {
+        return new WP_Error('missing_image', 'Image data is required', array('status' => 400));
+    }
+
+    $parts = explode(";", $img);
+    if (count($parts) < 2) {
+        return new WP_Error('invalid_image', 'Invalid image format', array('status' => 400));
+    }
+
+    $image = explode(",", $parts[1])[1];
     $image = str_replace(" ", "+", $image);
-    
     $image = base64_decode($image);
-    file_put_contents(STYLESHEETPATH."/certificate/cer-".date('Ymdhi').".jpeg", $image);
-    
-    echo "https://hooklearning.com/wp-content/themes/hook/certificate/cer-".date('Ymdhi').".jpeg";
-    exit();
+
+    if ($image === false) {
+        return new WP_Error('decode_failed', 'Failed to decode image', array('status' => 400));
+    }
+
+    $filename = STYLESHEETPATH . "/certificate/cer-" . date('Ymdhi') . ".jpeg";
+    if (!file_put_contents($filename, $image)) {
+        return new WP_Error('save_failed', 'Failed to save image', array('status' => 500));
+    }
+
+    $url = home_url("/wp-content/themes/hook/certificate/cer-" . date('Ymdhi') . ".jpeg");
+    return new WP_REST_Response($url, 200);
 }
-add_action('wp_ajax_get_image_capture', 'get_image_capture');
-add_action('wp_ajax_nopriv_get_image_capture', 'get_image_capture');
 
 define('PLANT_DISABLE_ACF', true);
 
