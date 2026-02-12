@@ -247,7 +247,7 @@ $lastname = get_user_meta($current_user->ID, 'last_name', true);
 $age = get_user_meta($current_user->ID, 'age', true);
 $job = get_user_meta($current_user->ID, 'job', true);
 
-if ($lastname  == '' && $age == '' && $job == '')  : ?>
+if ($lastname  == '' || $age == '' || $job == '')  : ?>
 <div id="survey-modal" class="s-modal-survey-wrap">
     <div class="s-modal-survey-bg"></div>
     <div class="s-modal-survey" role="dialog" aria-modal="true" aria-labelledby="survey-modal-title">

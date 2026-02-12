@@ -11,8 +11,11 @@ document.addEventListener("click", function (event) {
         submitAnswers(event.target);
     }
     if (event.target.closest(".button-download")) {
-        event.preventDefault();
-        doCapture();
+        var captureEl = document.querySelector(".cert-iamge");
+        if (captureEl) {
+            event.preventDefault();
+            doCapture();
+        }
         return;
     }
     if (event.target.matches(".btn-close-modal")) {
@@ -230,6 +233,8 @@ function closeSurveyModal() {
 }
 
 function doCapture() {
+    var el = document.querySelector('.cert-iamge');
+    if (!el) return;
     var sc;
     if( window.innerWidth <= 480 ){
         sc = 5;
@@ -238,7 +243,7 @@ function doCapture() {
     }else{
         sc = 2;
     }
-    html2canvas(document.querySelector('.cert-iamge'),
+    html2canvas(el,
     { scale: sc }).then(function (canvas) {
         fetch(hookRest.apiUrl, {
             method: 'POST',
