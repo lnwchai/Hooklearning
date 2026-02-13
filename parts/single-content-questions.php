@@ -93,7 +93,7 @@ $args_post_test = array(
 $post_test_log = get_posts($args_post_test);
 
 // Question log for regular questions (exclude pre/post)
-$args = array(
+$args_questions = array(
     'post_type' => 'question_log',
     'posts_per_page' => 1,
     'author' => get_current_user_id(),
@@ -104,21 +104,29 @@ $args = array(
             'value' => $root_id,
             'compare' => '=',
         ),
-        array (
+        array(
             'relation' => 'OR',
             array(
                 'key' => 'type',
                 'compare' => 'NOT EXISTS',
             ),
             array(
-                'key' => 'type',
-                'value' => array('pre', 'post'),
-                'compare' => 'NOT IN',
+                'relation' => 'AND',
+                array(
+					'key' => 'type',
+					'value' => 'pre',
+					'compare' => 'NOT LIKE',
+				),
+				array(
+					'key' => 'type',
+					'value' => 'post',
+					'compare' => 'NOT LIKE',
+				),
             ),
-        )
+        ),
     ),
 );
-$quesion_log = get_posts($args);
+$quesion_log = get_posts($args_questions);
 
 if($lessons) {
     $lesson_list_html .= '<ul class="course-sitebar-list">';

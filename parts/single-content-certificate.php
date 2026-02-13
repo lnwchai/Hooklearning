@@ -102,16 +102,22 @@ $args_questions = array(
                 'compare' => 'NOT EXISTS',
             ),
             array(
-                'key' => 'type',
-                'value' => array('pre', 'post'),
-                'compare' => 'NOT IN',
+                'relation' => 'AND',
+                array(
+					'key' => 'type',
+					'value' => 'pre',
+					'compare' => 'NOT LIKE',
+				),
+				array(
+					'key' => 'type',
+					'value' => 'post',
+					'compare' => 'NOT LIKE',
+				),
             ),
         ),
     ),
 );
 $quesion_log = get_posts($args_questions);
-
-
 
 $arg = array(
     'post_type' => 'course',

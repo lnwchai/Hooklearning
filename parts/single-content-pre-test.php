@@ -107,23 +107,26 @@ $args_questions = array(
             'value' => $root_id,
             'compare' => '=',
         ),
-        array (
+        array(
             'relation' => 'OR',
             array(
                 'key' => 'type',
                 'compare' => 'NOT EXISTS',
             ),
             array(
-                'key' => 'type',
-                'value' => 'pre',
-                'compare' => 'NOT IN',
+                'relation' => 'AND',
+                array(
+					'key' => 'type',
+					'value' => 'pre',
+					'compare' => 'NOT LIKE',
+				),
+				array(
+					'key' => 'type',
+					'value' => 'post',
+					'compare' => 'NOT LIKE',
+				),
             ),
-            array(
-                'key' => 'type',
-                'value' => 'post',
-                'compare' => 'NOT IN',
-            ),
-        )
+        ),
     ),
 );
 $quesion_log = get_posts($args_questions);

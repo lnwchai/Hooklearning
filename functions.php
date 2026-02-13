@@ -379,15 +379,22 @@ add_action( 'gform_after_submission', 'create_question_logs', 10, 2 );
 function create_question_logs( $entry, $form ) {
     $entry_id = $entry['id'];
     $course_id = rgar( $entry, '3' );
-    if ($form['id'] == 12 || ($course_id == null || intval($course_id) == 0)) {
-        $course_id = rgar( $entry, '20' );
+        foreach ( array( '20', '17', '14' ) as $field_id ) {
+            $course_id = rgar( $entry, $field_id );
+            if ( $course_id && (int) $course_id !== 0 ) {
+                break;
+            }
+        }
     }
 
     $user = wp_get_current_user();
-    $type_full = rgar( $entry, '21' );
+    $type_full = rgar( $entry, '18' );
+    if ( $type_full !== 'pre_test' && $type_full !== 'post_test' ) {
+        $type_full = rgar( $entry, '15' );
+    }
     if ($type_full == 'pre_test' || $type_full == 'post_test') {
         $name = $type_full == 'pre_test' ? 'แบบประเมินก่อนเรียน' : 'แบบประเมินหลังเรียน';
-        $type = str_replace('test', '', $type_full);
+        $type = str_replace('_test', '', $type_full);
     } else {
         $name = 'คำถามท้ายบทเรียน';
         $type = 'last';
@@ -505,15 +512,25 @@ function get_survey_form_entry() {
 }
 
 // user course log
-function user_course_log() {
+function user_course_log($course_id) {
+    if(empty($course_id)) {
+        return;
+    }
+    
     $course_log = get_posts(array(
         'post_type' => 'course_log',
         'post_status' => 'publish',
         'posts_per_page' => 10,
         'meta_query' => array(
+            'relation' => 'AND',
             array(
                 'key' => 'student',
                 'value' => get_current_user_id(),
+                'compare' => '=',
+            ),
+            array(
+                'key' => 'course_id',
+                'value' => $course_id,
                 'compare' => '=',
             ),
         )

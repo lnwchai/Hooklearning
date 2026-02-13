@@ -83,7 +83,7 @@ $args_post_test = array(
 $post_test_log = get_posts($args_post_test);
 
 // Question log for regular questions (exclude pre/post)
-$args = array(
+$args_questions = array(
     'post_type' => 'question_log',
     'posts_per_page' => 1,
     'author' => get_current_user_id(),
@@ -101,14 +101,22 @@ $args = array(
                 'compare' => 'NOT EXISTS',
             ),
             array(
-                'key' => 'type',
-                'value' => array('pre', 'post'),
-                'compare' => 'NOT IN',
+                'relation' => 'AND',
+                array(
+					'key' => 'type',
+					'value' => 'pre',
+					'compare' => 'NOT LIKE',
+				),
+				array(
+					'key' => 'type',
+					'value' => 'post',
+					'compare' => 'NOT LIKE',
+				),
             ),
         ),
     ),
 );
-$quesion_log = get_posts($args);
+$quesion_log = get_posts($args_questions);
 
 $arg = array(
     'post_type' => 'course',
@@ -203,8 +211,6 @@ if($lessons) {
 }
 wp_reset_postdata();
 ?>
-
-
 
 <div class="_space"></div>
 <div class="course-area">
@@ -360,4 +366,27 @@ wp_reset_postdata();
         <?php echo do_shortcode('[gravityform id="16" title="false" description="false"]'); ?>
     </div>
 </div>
+<?php endif; ?>
+
+<?php 
+$survay = get_survey_form_entry ();
+$course_log = user_course_log($root_id);
+$survey_ulog = get_user_meta(get_current_user_id(), 'survey_ulog_'.$root_id, true);
+$survey_ulog = $survey_ulog ? $survey_ulog : 0;
+if(count($course_log) == 1 && count($survay) == 0 && $survey_ulog == 0) : ?>
+    <div id="survey-modal" class="s-modal-survey-wrap">
+        <div class="s-modal-survey-bg"></div>
+        <div class="s-modal-survey" role="dialog" aria-modal="true" aria-labelledby="survey-modal-title">
+            <button type="button" class="btn-close-modal s-modal-survey-close" aria-label="Close">&times;</button>
+            <h2 id="survey-modal-title" class="s-modal-survey-title">แบบประเมินความพึงพอใจ</h2>
+            <div class="s-modal-survey-content">
+                <?php echo do_shortcode( '[gravityform id="16" title="false" description="false" ajax="false"]' ); ?>
+            </div>
+        </div>
+    </div>
+    <?php 
+    if($survey_ulog == 0) :
+        update_user_meta(get_current_user_id(), 'survey_ulog_'.$root_id, 1);
+    endif; 
+    ?>
 <?php endif; ?>

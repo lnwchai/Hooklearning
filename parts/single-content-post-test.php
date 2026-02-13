@@ -114,9 +114,17 @@ $args_questions = array(
                 'compare' => 'NOT EXISTS',
             ),
             array(
-                'key' => 'type',
-                'value' => array('pre', 'post'),
-                'compare' => 'NOT IN',
+                'relation' => 'AND',
+                array(
+					'key' => 'type',
+					'value' => 'pre',
+					'compare' => 'NOT LIKE',
+				),
+				array(
+					'key' => 'type',
+					'value' => 'post',
+					'compare' => 'NOT LIKE',
+				),
             ),
         ),
     ),
@@ -228,7 +236,7 @@ wp_reset_postdata();
                     <?php if(function_exists('seed_social')) { seed_social();} ?>
                 </div>
             </div>
-            <div class="questions-forms">
+            <div class="questions-forms">				
                 <?php 
                 if( empty($post_test_log) ){
                     echo do_shortcode( '[gravityform id="'.$post_test_form.'" title="false" description="false" ajax="false"]' );
