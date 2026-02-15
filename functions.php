@@ -379,6 +379,7 @@ add_action( 'gform_after_submission', 'create_question_logs', 10, 2 );
 function create_question_logs( $entry, $form ) {
     $entry_id = $entry['id'];
     $course_id = rgar( $entry, '3' );
+    if ( $form['id'] == 12 || ! $course_id || (int) $course_id === 0 ) {
         foreach ( array( '20', '17', '14' ) as $field_id ) {
             $course_id = rgar( $entry, $field_id );
             if ( $course_id && (int) $course_id !== 0 ) {
