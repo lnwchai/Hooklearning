@@ -241,8 +241,36 @@ wp_reset_postdata();
                 if( empty($pre_test_log) ){
                     echo do_shortcode( '[gravityform id="'.$pre_test_form.'" title="false" description="false" ajax="false"]' );
                 }else{
-                    echo '<h4 class="text-center">คุณได้ส่งแบบประเมินก่อนเรียนเรียบร้อยแล้ว</h4>';
-                }
+                    $confirmation_message = '';
+                    if ( class_exists( 'GFAPI' ) ) {
+                        $form = GFAPI::get_form( (int) $pre_test_form );
+                        if ( ! is_wp_error( $form ) && ! empty( $form['confirmations'] ) ) {
+                            foreach ( $form['confirmations'] as $confirmation ) {
+                                if ( ! empty( $confirmation['isDefault'] ) && isset( $confirmation['message'] ) ) {
+                                    $confirmation_message = $confirmation['message'];
+                                    break;
+                                }
+                            }
+                            if ( '' === $confirmation_message ) {
+                                foreach ( $form['confirmations'] as $confirmation ) {
+                                    if ( ( $confirmation['type'] ?? '' ) === 'message' && isset( $confirmation['message'] ) ) {
+                                        $confirmation_message = $confirmation['message'];
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    $entry_id = get_field('answers_entry_id', $pre_test_log[0]->ID);
+                    $form_entry = GFAPI::get_entry( $entry_id );
+                    $quiz_score = $form_entry['gquiz_score'];
+                    $message = $confirmation_message !== '' ? $confirmation_message : 'คุณได้ส่งแบบประเมินก่อนเรียนเรียบร้อยแล้ว';
+                    echo '<div class="gf_submission_confirmation_message">';
+                    echo wp_kses_post( $message );
+                    echo '<h5><b>คะแนนรวมของคุณคือ '.$quiz_score.' คะแนน</b></h5>';
+                    echo '</div>';
+                 }
                 ?>
             </div>
         </div>
